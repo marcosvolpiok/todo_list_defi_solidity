@@ -7,24 +7,31 @@ import {useEffect, useState, useCallback} from 'react'
 
 
 var Web3 = require('web3');
-window.web3 = new Web3('ws://127.0.0.1:8545');
 
 
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
 
-  const fetchMyAPI = useCallback(async () => {
+  const fetchMyAPI = useCallback(async () => {    
+    window.web3 = await new Web3('ws://127.0.0.1:8545');
+
     await window.ethereum.enable();
-    console.log('selectedAddress 22', window.ethereum.selectedAddress);
+
+
 
     const accounts = await window.web3.eth.getAccounts();
     console.log('ACCCOUNTS', accounts);
 
+
+
     const acc = window.web3.eth.getAccounts(console.log);
-    const contract = new window.web3.eth.Contract(ToDo.abi, "0xCfEB869F69431e42cdB54A4F4f105C19C080A601")
+    const currentAccount = await window.ethereum.selectedAddress;
+    console.log('currentAccount', currentAccount);
+
+    const contract = new window.web3.eth.Contract(ToDo.abi, "0xCfEB869F69431e42cdB54A4F4f105C19C080A601");
     const result = await contract.methods.createTask('Created from React 3', 'React user!')
-    .send({from: '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0'})
+    .send({from: currentAccount})
     .on('receipt', function (receipt) {
       console.log('method executed!');
     });
