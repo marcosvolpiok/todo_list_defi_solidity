@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import Web3 from 'web3';
-//import ToDo from './abis/ToDo.json'
+import ToDo from './abis/ToDo.json'
 import {useEffect} from 'react'
 
 
