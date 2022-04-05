@@ -1,4 +1,4 @@
-pragma solidity ^0.5.16;
+pragma experimental ABIEncoderV2;
 
 contract ToDo {
   struct Task {
@@ -15,5 +15,9 @@ contract ToDo {
 
   function checkTask(uint8 _id) public {
     tasks[_id].status = true;
+  }
+  
+  function getTasks() public view returns(Task[] memory) {
+    return tasks;
   }
 }

@@ -12,6 +12,7 @@ var Web3 = require('web3');
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
+  const [tasks, setTasks] = useState([]);
 
   const fetchMyAPI = useCallback(async () => {    
     window.web3 = await new Web3('ws://127.0.0.1:8545');
@@ -29,7 +30,7 @@ function App() {
     const currentAccount = await window.ethereum.selectedAddress;
     console.log('currentAccount', currentAccount);
 
-    const contract = new window.web3.eth.Contract(ToDo.abi, "0xCfEB869F69431e42cdB54A4F4f105C19C080A601");
+    const contract = new window.web3.eth.Contract(ToDo.abi, "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B");
     const result = await contract.methods.createTask('Created from React 3', 'React user!')
     .send({from: currentAccount})
     .on('receipt', function (receipt) {
@@ -37,9 +38,14 @@ function App() {
     });
     console.log(result)
 
+    const result2 = await contract.methods.getTasks().call();
+    console.log(result2);
+    setTasks(result2);
 
-    const list = await contract.methods.tasks(1).call();
-    console.log('list', list);
+
+
+    // const list = await contract.methods.tasks(1).call();
+    // console.log('list', list);
   }, [])
 
   useEffect(() => {
@@ -48,22 +54,17 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      {tasks.map((task ,i) => (
+        <div key={i}>
+          <p>
+            {task.description}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
+
+
 
 export default App;
