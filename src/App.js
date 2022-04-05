@@ -7,8 +7,8 @@ import {useEffect, useState, useCallback} from 'react'
 
 
 var Web3 = require('web3');
-
-
+var contract;
+var currentAccount;
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
@@ -27,10 +27,10 @@ function App() {
 
 
     const acc = window.web3.eth.getAccounts(console.log);
-    const currentAccount = await window.ethereum.selectedAddress;
+    currentAccount = await window.ethereum.selectedAddress;
     console.log('currentAccount', currentAccount);
 
-    const contract = new window.web3.eth.Contract(ToDo.abi, "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B");
+    contract = new window.web3.eth.Contract(ToDo.abi, "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B");
     const result = await contract.methods.createTask('Created from React 3', 'React user!')
     .send({from: currentAccount})
     .on('receipt', function (receipt) {
@@ -38,26 +38,43 @@ function App() {
     });
     console.log(result)
 
-    const result2 = await contract.methods.getTasks().call();
-    console.log(result2);
-    setTasks(result2);
-
-
-
     // const list = await contract.methods.tasks(1).call();
     // console.log('list', list);
+    getTasks();
   }, [])
 
   useEffect(() => {
     fetchMyAPI()
   }, [fetchMyAPI])
 
+
+  async function check(id) {
+    const result = await contract.methods.checkTask(id)
+    .send({from: currentAccount})
+    .on('receipt', function (receipt) {
+      console.log('method executed!');
+      getTasks();
+    });
+  }
+
+  async function getTasks(){
+    const result2 = await contract.methods.getTasks().call();
+    console.log(result2);
+    setTasks(result2);
+  }
+
   return (
     <div className="App">
       {tasks.map((task ,i) => (
         <div key={i}>
           <p>
-            {task.description}
+            ID: {i} - 
+
+            {task.status == true &&
+              <span>Checked - </span>
+            }
+          
+           {task.description} -  <button onClick={() => check(i)}>Check</button>
           </p>
         </div>
       ))}
