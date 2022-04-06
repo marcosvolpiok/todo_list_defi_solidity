@@ -9,7 +9,7 @@ import {useEffect, useState, useCallback} from 'react'
 var Web3 = require('web3');
 var contract;
 var currentAccount;
-const contractAddress = '0xe14E93b1a9f7227f7B3851B12FDF4c7BcA4428Db';
+const contractAddress = '0xd0fef44a2f2467429f8620444aDAdD37247114EF';
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
@@ -63,8 +63,9 @@ function App() {
   }
 
   async function getTasksByOwner(){
-    const result = await contract.methods.getTasksByOwner().call();
-    console.log(result)
+    const result = await contract.methods.getTasksByOwner(currentAccount).call();
+    console.log(result);
+    setTasks(result);
   }  
 
   async function createTask(){

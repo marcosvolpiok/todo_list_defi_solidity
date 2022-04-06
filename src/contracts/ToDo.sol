@@ -26,18 +26,14 @@ contract ToDo {
     return tasks;
   }
 
-  function getTasksByOwner() external view returns(Task[] memory) {
+  function getTasksByOwner(address owner) external view returns(Task[] memory) {
     Task[] memory result = new Task[](tasks.length);
-    //uint counter = 0;
+    uint counter = 0;
     for (uint i = 0; i < tasks.length; i++) {
-      //if (owner == tasks[i].owner) {
-        result[i] = tasks[i];
-        //Task memory result = tasks[i];
-
-
-        //result.push(tasks[i]);
-        //counter++;
-      //}
+      if (owner == tasks[i].owner) {
+        result[counter] = tasks[i];
+        counter++;
+      }
     }
 
     return result;
