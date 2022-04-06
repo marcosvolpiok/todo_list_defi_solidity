@@ -9,7 +9,7 @@ import {useEffect, useState, useCallback} from 'react'
 var Web3 = require('web3');
 var contract;
 var currentAccount;
-const contractAddress = '0x180D179Bbf473A30183Fe858E8416351D2170Fd2';
+const contractAddress = '0xe14E93b1a9f7227f7B3851B12FDF4c7BcA4428Db';
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
@@ -62,6 +62,11 @@ function App() {
     setTasks(result2);
   }
 
+  async function getTasksByOwner(){
+    const result = await contract.methods.getTasksByOwner().call();
+    console.log(result)
+  }  
+
   async function createTask(){
     console.log('user', user)
     const result = await contract.methods.createTask(description, user)
@@ -98,6 +103,8 @@ function App() {
         <button onClick={() => createTask()}>Add</button>
         <button onClick={() => cleanTasks()}>Clean</button>
       </div>
+
+      <button onClick={() => getTasksByOwner()}>Tasks from this wallet</button>
 
 
       {tasks.map((task ,i) => (
