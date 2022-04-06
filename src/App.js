@@ -9,6 +9,7 @@ import {useEffect, useState, useCallback} from 'react'
 var Web3 = require('web3');
 var contract;
 var currentAccount;
+const contractAddress = '0x0E696947A06550DEf604e82C26fd9E493e576337';
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
@@ -30,13 +31,8 @@ function App() {
     currentAccount = await window.ethereum.selectedAddress;
     console.log('currentAccount', currentAccount);
 
-    contract = new window.web3.eth.Contract(ToDo.abi, "0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B");
-    const result = await contract.methods.createTask('Created from React 3', 'React user!')
-    .send({from: currentAccount})
-    .on('receipt', function (receipt) {
-      console.log('method executed!');
-    });
-    console.log(result)
+    contract = new window.web3.eth.Contract(ToDo.abi, contractAddress);
+
 
     // const list = await contract.methods.tasks(1).call();
     // console.log('list', list);
@@ -63,18 +59,26 @@ function App() {
     setTasks(result2);
   }
 
+  async function createTask(description, user){
+    const result = await contract.methods.createTask(description, user)
+    .send({from: currentAccount})
+    .on('receipt', function (receipt) {
+      console.log('method executed!');
+    });
+    console.log(result)
+  }
+
   return (
     <div className="App">
       {tasks.map((task ,i) => (
         <div key={i}>
-          <p>
-            ID: {i} - 
-
-            {task.status == true &&
-              <span>Checked - </span>
+          <p
+          style={{ textDecoration: task.status == true && 'line-through' }}
+          >
+            ID: {i} - {task.description} -  
+            {task.status == false &&
+              <button onClick={() => check(i)}>Check</button>
             }
-          
-           {task.description} -  <button onClick={() => check(i)}>Check</button>
           </p>
         </div>
       ))}
