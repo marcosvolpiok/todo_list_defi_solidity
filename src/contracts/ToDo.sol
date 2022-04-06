@@ -16,6 +16,10 @@ contract ToDo {
   function checkTask(uint8 _id) public {
     tasks[_id].status = true;
   }
+
+  function cleanTasks() public {
+    delete tasks;
+  }
   
   function getTasks() public view returns(Task[] memory) {
     return tasks;

@@ -9,11 +9,14 @@ import {useEffect, useState, useCallback} from 'react'
 var Web3 = require('web3');
 var contract;
 var currentAccount;
-const contractAddress = '0x0E696947A06550DEf604e82C26fd9E493e576337';
+const contractAddress = '0x180D179Bbf473A30183Fe858E8416351D2170Fd2';
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
   const [tasks, setTasks] = useState([]);
+  const [user, setUser] = useState(String);
+  const [description, setDescription] = useState(String);
+  
 
   const fetchMyAPI = useCallback(async () => {    
     window.web3 = await new Web3('ws://127.0.0.1:8545');
@@ -59,17 +62,44 @@ function App() {
     setTasks(result2);
   }
 
-  async function createTask(description, user){
+  async function createTask(){
+    console.log('user', user)
     const result = await contract.methods.createTask(description, user)
-    .send({from: currentAccount})
+    .send({from: currentAccount, gasLimit: 10000000})
     .on('receipt', function (receipt) {
       console.log('method executed!');
+      getTasks();
+    });
+    console.log(result)
+  }
+
+  async function cleanTasks(){
+    const result = await contract.methods.cleanTasks()
+    .send({from: currentAccount, gasLimit: 10000000})
+    .on('receipt', function (receipt) {
+      console.log('method executed!');
+      getTasks();
     });
     console.log(result)
   }
 
   return (
     <div className="App">
+      <div>
+        <div>
+          <input type="text" name="description" placeholder="Description" 
+          onChange={event => setDescription(event.target.value)} />
+        </div>
+
+        <div>
+          <input type="text" name="user" placeholder="User"
+          onChange={event => setUser(event.target.value)} />
+        </div>
+        <button onClick={() => createTask()}>Add</button>
+        <button onClick={() => cleanTasks()}>Clean</button>
+      </div>
+
+
       {tasks.map((task ,i) => (
         <div key={i}>
           <p
@@ -79,6 +109,7 @@ function App() {
             {task.status == false &&
               <button onClick={() => check(i)}>Check</button>
             }
+            - By: {task.user}
           </p>
         </div>
       ))}
