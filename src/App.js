@@ -9,7 +9,7 @@ import {useEffect, useState, useCallback} from 'react'
 var Web3 = require('web3');
 var contract;
 var currentAccount;
-const contractAddress = '0xd0fef44a2f2467429f8620444aDAdD37247114EF';
+const contractAddress = '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0';
 
 function App() {
   //const [data, dataSet] = useState<any>(null)

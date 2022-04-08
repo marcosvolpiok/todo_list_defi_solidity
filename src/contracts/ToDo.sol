@@ -15,6 +15,7 @@ contract ToDo {
   }
 
   function checkTask(uint8 _id) public {
+    require (msg.sender == tasks[_id].owner);
     tasks[_id].status = true;
   }
 
