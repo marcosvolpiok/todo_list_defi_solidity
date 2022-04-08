@@ -1,6 +1,8 @@
 pragma experimental ABIEncoderV2;
 
-contract ToDo {
+import "./ownable.sol";
+
+contract ToDo is Ownable {
   struct Task {
     string description;
     string user;
@@ -10,16 +12,21 @@ contract ToDo {
 
   Task[] public tasks;
 
+  modifier onlyOwnerOf(uint _taskId) {
+    require(msg.sender == tasks[_taskId].owner);
+    _;
+  }
+
   function createTask(string memory _description, string memory _user) public {
     tasks.push(Task(_description, _user, false, msg.sender));
   }
 
-  function checkTask(uint8 _id) public {
+  function checkTask(uint8 _id) public onlyOwnerOf(_id) {
     require (msg.sender == tasks[_id].owner);
     tasks[_id].status = true;
   }
 
-  function cleanTasks() public {
+  function cleanTasks() public onlyOwner {
     delete tasks;
   }
   
@@ -27,7 +34,7 @@ contract ToDo {
     return tasks;
   }
 
-  function getTasksByOwner(address owner) external view returns(Task[] memory) {
+  function getTasksByOwner(address owner) public view returns(Task[] memory) {
     Task[] memory result = new Task[](tasks.length);
     uint counter = 0;
     for (uint i = 0; i < tasks.length; i++) {
