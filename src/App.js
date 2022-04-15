@@ -9,7 +9,7 @@ import {useEffect, useState, useCallback} from 'react'
 var Web3 = require('web3');
 var contract;
 var currentAccount;
-const contractAddress = '0x9b1f7F645351AF3631a656421eD2e40f2802E6c0';
+const contractAddress = '0x9561C133DD8580860B6b7E504bC5Aa500f0f06a7';
 
 function App() {
   //const [data, dataSet] = useState<any>(null)
@@ -18,8 +18,27 @@ function App() {
   const [description, setDescription] = useState(String);
   
 
-  const fetchMyAPI = useCallback(async () => {    
-    window.web3 = await new Web3('ws://127.0.0.1:8545');
+  const fetchMyAPI = useCallback(async () => {  
+    console.log('web3', window.web3);
+    console.log('ethereum', window.ethereum);
+
+    //App.web3Provider = window.ethereum;
+    // connect app with metamask wallet
+    //await window.ethereum.request({ method: 'eth_requestAccounts'});
+    
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else {
+      window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+
+
+    // window.web3 = await new Web3('ws://127.0.0.1:8545');
 
     await window.ethereum.enable();
 
@@ -57,9 +76,13 @@ function App() {
   }
 
   async function getTasks(){
-    const result2 = await contract.methods.getTasks().call();
-    console.log(result2);
-    setTasks(result2);
+    try{
+      const result2 = await contract.methods.getTasks().call();
+      console.log(result2);
+      setTasks(result2);
+    }catch(e){
+      console.log('error', e.message)
+    }
   }
 
   async function getTasksByOwner(){
@@ -70,13 +93,17 @@ function App() {
 
   async function createTask(){
     console.log('user', user)
-    const result = await contract.methods.createTask(description, user)
-    .send({from: currentAccount, gasLimit: 10000000})
-    .on('receipt', function (receipt) {
-      console.log('method executed!');
-      getTasks();
-    });
+    try{
+      const result = await contract.methods.createTask(description, user)
+      .send({from: currentAccount})
+      .on('receipt', function (receipt) {
+        console.log('method executed!');
+        getTasks();
+      });
     console.log(result)
+    }catch(e){
+      console.log('error', e.message)
+    }
   }
 
   async function cleanTasks(){
